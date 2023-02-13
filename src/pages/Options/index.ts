@@ -97,6 +97,11 @@ for (let m = 0; m < 60; m++) {
   minutes[(m < 10 ? '0' : '') + m] = m;
 }
 
+const customPeriods: Record<string, number> = {};
+for (let i = 0; i < 365; i++){
+  customPeriods[`${i}`] = i;
+}
+
 function setWeekdayDropdown() {
   setDropdown(
     weekdays,
@@ -145,6 +150,15 @@ function setAmPmDropdown() {
   });
 }
 
+function setCustomPeriodDropdown() {
+  setDropdown(customPeriods, 'custom-options', 'custom-selected', (key: string) => {
+    // set option
+    chrome.storage.sync.set({
+      custom_period: customPeriods[key],
+    });
+  });
+}
+
 function getSelectedAmPm() {
   return document.getElementById('ampm-selected')?.textContent?.trim() || 'am';
 }
@@ -153,6 +167,7 @@ const periods: Record<string, string> = {
   day: 'Day',
   week: 'Week',
   month: 'Month',
+  custom: 'Custom'
 };
 
 function setSelectedPeriod(key: string) {
@@ -165,6 +180,11 @@ function setSelectedPeriod(key: string) {
     const weekday = document.getElementById('weekday-dropdown');
     if (key !== 'week') weekday?.classList.add('hidden');
     else weekday?.classList.remove('hidden');
+
+    const custom = document.getElementById('custom-dropdown');
+    if( key !== 'custom') custom?.classList.add('hidden') 
+    else custom?.classList.remove('hidden');
+    
     const label = document.getElementById('start-label');
     if (label) {
       label.textContent = periods[key] + ' start';
@@ -298,6 +318,7 @@ function setBooleanOptions() {
 }
 
 setStoreLinks();
+setCustomPeriodDropdown();
 setWeekdayDropdown();
 setHoursDropdown();
 setMinutesDropdown();
@@ -346,6 +367,11 @@ chrome.storage.sync.get(storedUserOptions, (items) => {
     (options.start_minutes < 10 ? '0' : '') + options.start_minutes,
     'minutes-options',
     'minutes-selected'
+  );
+  setSelectedDropdownOption(
+    `${options.custom_period}`,
+    'custom-options',
+    'custom-selected'
   );
   setBooleanOptions();
   setRollingPeriodEffects();

@@ -22,7 +22,8 @@ export default function App(): JSX.Element {
         options.start_hour,
         options.start_minutes,
         delta,
-        options.rolling_period
+        options.rolling_period,
+        options?.custom_period
       );
     }
 

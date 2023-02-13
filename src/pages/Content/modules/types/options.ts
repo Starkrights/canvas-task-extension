@@ -1,4 +1,4 @@
-export type Period = 'Day' | 'Week' | 'Month';
+export type Period = 'Day' | 'Week' | 'Month' | 'Custom';
 
 interface Options {
   complete_assignments?: number[];
@@ -14,6 +14,7 @@ interface Options {
   show_confetti: boolean;
   theme_color: string;
   dark_mode: boolean;
+  custom_period: number;
 }
 
 export default Options;

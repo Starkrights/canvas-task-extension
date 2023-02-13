@@ -55,13 +55,28 @@ export function getMonthEnd(startDate?: Date): Date {
   return d;
 }
 
+export function getCustomPeriodStart(startDate: number, length: number): Date {
+  const d = new Date();
+  d.setDate(d.getDate() - ((d.getDay() - startDate + length) % length));
+  d.setHours(0, 0, 0);
+  return d;
+}
+
+export function getCustomPeriodEnd(startDate: Date, length: number): Date {
+    const d = new Date(startDate);
+  d.setDate(d.getDate() + length);
+  d.setHours(0, 0, 0);
+  return d;
+}
+
 export default function getPeriod(
   period: Period,
   startDate: number,
   startHours: number,
   startMinutes: number,
   delta: number,
-  rollingPeriod?: boolean
+  rollingPeriod?: boolean,
+  customPeriod?: number
 ): { start: Date; end: Date } {
   let prevPeriodStart = getMonthStart();
   let nextPeriodStart = getMonthEnd();
@@ -96,10 +111,17 @@ export default function getPeriod(
       prevPeriodStart.setDate(prevPeriodStart.getDate() + delta);
       nextPeriodStart.setDate(nextPeriodStart.getDate() + delta);
       break;
-    default:
+    case 'Week':
       nextPeriodStart = getWeekEnd(prevPeriodStart);
       prevPeriodStart.setDate(prevPeriodStart.getDate() + 7 * delta);
       nextPeriodStart.setDate(nextPeriodStart.getDate() + 7 * delta);
+      break;
+    case 'Custom':
+      if(!customPeriod)
+        break;
+      nextPeriodStart = getCustomPeriodEnd(prevPeriodStart, customPeriod);
+      prevPeriodStart.setDate(prevPeriodStart.getDate() + customPeriod * delta);
+      nextPeriodStart.setDate(nextPeriodStart.getDate() + customPeriod * delta);
       break;
   }
 
